@@ -1,7 +1,8 @@
-package com.example.supportlearningjp.config;
+package com.example.supportlearningjp.config.Filter;
 
 import com.example.supportlearningjp.service.JWTService;
 import com.example.supportlearningjp.service.UserService;
+import com.example.supportlearningjp.util.jwt.JwtUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,6 +15,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -31,7 +33,7 @@ import static java.util.Arrays.stream;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final UserService userService;
+    private UserDetailsService userDetailsService;
     private  final JWTService jwtService;
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -41,10 +43,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
           return;
      }
 
-         String jwt= getJwtFromRequest(request);
+         String jwt= JwtUtils.getJwtFromRequest(request);
          if(StringUtils.hasText(jwt) && jwtService.validateToken(jwt)&& SecurityContextHolder.getContext().getAuthentication()==null){
-             String email= jwtService.getUserNameFromJwt(jwt);
-             UserDetails userDetails=userService.loadUserByUsername(email);
+             String email= jwtService.getEmailFromJwt(jwt);
+             UserDetails userDetails=userDetailsService.loadUserByUsername(email);
              SecurityContext securityContext= SecurityContextHolder.createEmptyContext();
 //           Collection<SimpleGrantedAuthority> authorities=new ArrayList<>();
 //          String[] roles=jwtService.getRolesFromJwt(jwt);
@@ -62,10 +64,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     {
         final List<Pair<String,String>> byPassTokens= Arrays.asList(
                 Pair.of("register","POST"),
-                Pair.of("login","POST")
+                Pair.of("login","POST"),
+                Pair.of("api/token/refreshToken","GET")
         );
         for (Pair<String,String> bypassToken:byPassTokens)
         {
+
             if(request.getServletPath().contains(bypassToken.getFirst())&&
                     request.getMethod().equals(bypassToken.getSecond()))
             {
@@ -75,12 +79,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         return false;
     }
-    private String getJwtFromRequest(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-        // Kiểm tra xem header Authorization có chứa thông tin jwt không
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
-        }
-        return null;
-    }
+
 }
