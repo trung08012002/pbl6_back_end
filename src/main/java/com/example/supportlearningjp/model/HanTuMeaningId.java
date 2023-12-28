@@ -1,10 +1,7 @@
 package com.example.supportlearningjp.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serializable;
 @NoArgsConstructor
@@ -12,6 +9,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @Embeddable
+@EqualsAndHashCode
 public class HanTuMeaningId implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY,optional = false,cascade = CascadeType.ALL)
     @JoinColumn(name = "id_han_tu")
