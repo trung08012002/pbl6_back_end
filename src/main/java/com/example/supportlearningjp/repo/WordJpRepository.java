@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
+
 public interface WordJpRepository extends JpaRepository<WordJP,Integer> {
     @Query(value =
 //            "SELECT * FROM word_jp WHERE "

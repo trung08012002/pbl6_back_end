@@ -1,13 +1,13 @@
 package com.example.supportlearningjp.repo;
 
 import com.example.supportlearningjp.model.User;
-import org.springframework.context.annotation.Primary;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Repository("userRepository")
+
 public interface UserRepository extends JpaRepository<User,Long> {
     Optional<User> findByEmail(String email);
 

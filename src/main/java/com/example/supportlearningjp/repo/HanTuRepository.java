@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
+
 public interface HanTuRepository extends JpaRepository<Kanji,Integer> {
 
     @Query(value="SELECT * FROM kanji WHERE tu in :kanjis",
